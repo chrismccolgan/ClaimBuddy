@@ -20,5 +20,11 @@ namespace ClaimBuddy.Auth.Models
         [Compare(nameof(Password))]
         [DisplayName("Confirm Password")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        public string FirstName { get; set; }
+
+        [Required]
+        public string LastName { get; set; }
     }
 }

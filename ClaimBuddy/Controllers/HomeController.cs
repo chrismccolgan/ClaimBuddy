@@ -1,26 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using ClaimBuddy.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using ClaimBuddy.Repositories;
 
 namespace ClaimBuddy.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly IUserProfileRepository _userProfileRepository;
+        
+        private int GetCurrentUserProfileId()
         {
-            _logger = logger;
+            return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        }
+
+        public HomeController(IUserProfileRepository userProfileRepository)
+        {
+            _userProfileRepository = userProfileRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var userProfileId = GetCurrentUserProfileId();
+            var userProfile = _userProfileRepository.GetById(userProfileId);
+            return View(userProfile);
         }
 
         public IActionResult Privacy()
