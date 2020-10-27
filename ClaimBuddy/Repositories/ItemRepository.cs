@@ -14,7 +14,8 @@ namespace ClaimBuddy.Repositories
         {
             get
             {
-                return @"SELECT i.Id, i.Name, i.Notes, i.Price, i.PurchaseDate, i.CreateDateTime, i.UserProfileId, i.CategoryId, i.Image
+                return @"SELECT i.Id, i.Name, i.Notes, i.Price, i.PurchaseDate, i.CreateDateTime, i.UserProfileId, i.CategoryId, i.Image,
+                                c.Name AS CategoryName
                            FROM Item i
                       LEFT JOIN UserProfile up on i.UserProfileId = up.Id
                       LEFT JOIN Category c on i.CategoryId = c.Id
@@ -34,7 +35,12 @@ namespace ClaimBuddy.Repositories
                 PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                 CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                 UserProfileId = reader.GetInt32(reader.GetOrdinal("UserProfileId")),
-                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId"))
+                CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
+                Category = new Category()
+                {
+                    Id = reader.GetInt32(reader.GetOrdinal("CategoryId")),
+                    Name = reader.GetString(reader.GetOrdinal("CategoryName"))
+                }
             };
         }
 
@@ -58,47 +64,50 @@ namespace ClaimBuddy.Repositories
             }
         }
 
-        //public object GetbyId(int id)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = QuoteQuery + " WHERE q.id = @Id";
-        //            DbUtils.AddParameter(cmd, "@Id", id);
+        public Item GetById(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = ItemQuery + " AND i.Id = @Id";
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    var reader = cmd.ExecuteReader();
+                    Item item = null;
+                    if (reader.Read())
+                    {
+                        item = NewItem(reader);
+                    }
+                    reader.Close();
+                    return item;
+                }            
+            }
+        }
 
-        //            Quote quote = null;
-
-        //            var reader = cmd.ExecuteReader();
-        //            if (reader.Read())
-        //            {
-        //                quote = NewQuote(reader);
-        //            }
-        //            reader.Close();
-
-        //            return quote;
-        //        }
-        //    }
-        //}
-
-        //public void Add(Quote quote)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"INSERT INTO Quote (Text, UserProfileId)
-        //                                OUTPUT INSERTED.ID
-        //                                VALUES (@Text, @UserProfileId)";
-        //            DbUtils.AddParameter(cmd, "@Text", quote.Text);
-        //            DbUtils.AddParameter(cmd, "@UserProfileId", quote.UserProfileId);
-
-        //            quote.Id = (int)cmd.ExecuteScalar();
-        //        }
-        //    }
-        //}
+        public void Add(Item item)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Item (Name, Notes, Price, Image, PurchaseDate, CreateDateTime, IsDeleted, CategoryId, UserProfileId)
+                                        OUTPUT INSERTED.ID
+                                        VALUES (@Name, @Notes, @Price, @Image, @PurchaseDate, @CreateDateTime, @IsDeleted, @CategoryId, @UserProfileId)";
+                    cmd.Parameters.AddWithValue("@Name", item.Name);
+                    cmd.Parameters.AddWithValue("@Notes", item.Notes ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Price", item.Price);
+                    cmd.Parameters.AddWithValue("@Image", item.Image ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PurchaseDate", item.PurchaseDate);
+                    cmd.Parameters.AddWithValue("@CreateDateTime", item.CreateDateTime);
+                    cmd.Parameters.AddWithValue("@IsDeleted", item.IsDeleted);
+                    cmd.Parameters.AddWithValue("@CategoryId", item.CategoryId);
+                    cmd.Parameters.AddWithValue("@UserProfileId", item.UserProfileId);
+                    item.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+        }
 
     }
 }

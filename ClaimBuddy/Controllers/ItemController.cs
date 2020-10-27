@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ClaimBuddy.Models;
+using ClaimBuddy.Models.ViewModels;
 using ClaimBuddy.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 
 namespace ClaimBuddy.Controllers
 {
     public class ItemController : Controller
     {
         private readonly IItemRepository _itemRepository;
-        public ItemController(IItemRepository itemRepository)
+        private readonly ICategoryRepository _categoryRepository;
+        public ItemController(IItemRepository itemRepository, ICategoryRepository categoryRepository)
         {
             _itemRepository = itemRepository;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: ItemController
@@ -27,27 +31,46 @@ namespace ClaimBuddy.Controllers
         // GET: ItemController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Item item = _itemRepository.GetById(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return View(item);
         }
 
         // GET: ItemController/Create
         public ActionResult Create()
         {
-            return View();
+            var vm = new ItemFormViewModel
+            {
+                Item = new Item(),
+                Categories = _categoryRepository.GetAll()
+            };
+            return View(vm);
         }
 
         // POST: ItemController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Item item)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                item.CreateDateTime = DateAndTime.Now;
+                item.IsDeleted = false;
+                item.UserProfileId = 1;
+                _itemRepository.Add(item);
+                return RedirectToAction(nameof(Details), new { id = item.Id });
             }
             catch
             {
-                return View();
+                ItemFormViewModel vm = new ItemFormViewModel()
+                {
+                    Item = item,
+                    Categories = _categoryRepository.GetAll()
+                };
+                return View(vm);
             }
         }
 

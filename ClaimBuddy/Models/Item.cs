@@ -13,10 +13,12 @@ namespace ClaimBuddy.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
         public string Notes { get; set; }
 
+        [Required]
         public decimal Price { get; set; }
 
         public string Image { get; set; }
@@ -24,15 +26,17 @@ namespace ClaimBuddy.Models
         [DataType(DataType.Date)]
         public DateTime CreateDateTime { get; set; }
 
+        [Required]
         [DataType(DataType.Date)]
         public DateTime PurchaseDate { get; set; }
 
         public bool IsDeleted { get; set; }
 
+        [Required]
         [DisplayName("Category")]
         public int CategoryId { get; set; }
 
-        //public Category Category { get; set; }
+        public Category Category { get; set; }
 
         public int UserProfileId { get; set; }
     }
