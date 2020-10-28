@@ -44,14 +44,15 @@ namespace ClaimBuddy.Repositories
             };
         }
 
-        public List<Item> GetAll()
+        public List<Item> GetAll(int userProfileId)
         {
             using (var conn = Connection)
             {
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = ItemQuery;
+                    cmd.CommandText = ItemQuery + " AND i.UserProfileId = @UserProfileId";
+                    cmd.Parameters.AddWithValue("@UserProfileId", userProfileId);
                     var items = new List<Item>();
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -64,15 +65,16 @@ namespace ClaimBuddy.Repositories
             }
         }
 
-        public Item GetById(int id)
+        public Item GetById(int id, int userProfileId)
         {
             using (var conn = Connection)
             {
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = ItemQuery + " AND i.Id = @Id";
+                    cmd.CommandText = ItemQuery + " AND i.Id = @Id AND i.UserProfileId = @UserProfileId";
                     cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@UserProfileId", userProfileId);
                     var reader = cmd.ExecuteReader();
                     Item item = null;
                     if (reader.Read())
@@ -109,5 +111,53 @@ namespace ClaimBuddy.Repositories
             }
         }
 
+        public void Update(Item item)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Item
+                                           SET Name = @Name,
+                                               Notes = @Notes,
+                                               Price = @Price, 
+                                               Image = @Image, 
+                                               PurchaseDate = @PurchaseDate,
+                                               CreateDateTime = @CreateDateTime, 
+                                               IsDeleted = @IsDeleted,
+                                               CategoryId = @CategoryId, 
+                                               UserProfileId = @UserProfileId
+                                         WHERE Id = @Id";
+                    cmd.Parameters.AddWithValue("@Name", item.Name);
+                    cmd.Parameters.AddWithValue("@Notes", item.Notes ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Price", item.Price);
+                    cmd.Parameters.AddWithValue("@Image", item.Image ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PurchaseDate", item.PurchaseDate);
+                    cmd.Parameters.AddWithValue("@CreateDateTime", item.CreateDateTime);
+                    cmd.Parameters.AddWithValue("@IsDeleted", item.IsDeleted);
+                    cmd.Parameters.AddWithValue("@CategoryId", item.CategoryId);
+                    cmd.Parameters.AddWithValue("@UserProfileId", item.UserProfileId);
+                    cmd.Parameters.AddWithValue("@Id", item.Id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Delete(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Item
+                                           SET IsDeleted = 1
+                                         WHERE Id = @Id";
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

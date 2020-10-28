@@ -1,8 +1,10 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ClaimBuddy.Models.UserProfile
+
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-body">
+    <h1 class="display-4">Welcome, @Model.FirstName</h1>
+    <p>ClaimBuddy was created to give its users peace of mind in the event they need to file an insurance claim to replace an item lost due to an unfortunate event such as theft, fire, or flood. ClaimBuddy offers a convenient way to store the information one would need to file a successful claim. No more hoarding old receipts!</p>
 </div>

@@ -24,10 +24,12 @@ namespace ClaimBuddy.Models
         public string Image { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayName("Created")]
         public DateTime CreateDateTime { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
+        [DisplayName("Purchased")]
         public DateTime PurchaseDate { get; set; }
 
         public bool IsDeleted { get; set; }

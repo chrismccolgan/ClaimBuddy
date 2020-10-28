@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ClaimBuddy.Models;
 using ClaimBuddy.Models.ViewModels;
 using ClaimBuddy.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 
 namespace ClaimBuddy.Controllers
 {
+    [Authorize]
     public class ItemController : Controller
     {
         private readonly IItemRepository _itemRepository;
@@ -21,17 +24,23 @@ namespace ClaimBuddy.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // GET: ItemController
+        private int CurrentUserProfileId
+        {
+            get
+            {
+                return int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            }
+        }
+
         public ActionResult Index()
         {
-            List<Item> items = _itemRepository.GetAll();
+            List<Item> items = _itemRepository.GetAll(CurrentUserProfileId);
             return View(items);
         }
 
-        // GET: ItemController/Details/5
         public ActionResult Details(int id)
         {
-            Item item = _itemRepository.GetById(id);
+            Item item = _itemRepository.GetById(id, CurrentUserProfileId);
             if (item == null)
             {
                 return NotFound();
@@ -39,7 +48,6 @@ namespace ClaimBuddy.Controllers
             return View(item);
         }
 
-        // GET: ItemController/Create
         public ActionResult Create()
         {
             var vm = new ItemFormViewModel
@@ -50,7 +58,6 @@ namespace ClaimBuddy.Controllers
             return View(vm);
         }
 
-        // POST: ItemController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Item item)
@@ -59,7 +66,7 @@ namespace ClaimBuddy.Controllers
             {
                 item.CreateDateTime = DateAndTime.Now;
                 item.IsDeleted = false;
-                item.UserProfileId = 1;
+                item.UserProfileId = CurrentUserProfileId;
                 _itemRepository.Add(item);
                 return RedirectToAction(nameof(Details), new { id = item.Id });
             }
@@ -74,45 +81,54 @@ namespace ClaimBuddy.Controllers
             }
         }
 
-        // GET: ItemController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Item item  = _itemRepository.GetById(id, CurrentUserProfileId); 
+            if (item == null)
+            {
+                return NotFound();
+            }
+            var vm = new ItemFormViewModel
+            {
+                Item = item,
+                Categories = _categoryRepository.GetAll()
+            };
+            return View(vm);
         }
 
-        // POST: ItemController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Item item)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _itemRepository.Update(item);
+                return RedirectToAction(nameof(Details), new { id = item.Id });
             }
             catch
             {
-                return View();
+                return View(item);
             }
         }
 
-        // GET: ItemController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Item item = _itemRepository.GetById(id, CurrentUserProfileId);
+            return View(item);
         }
 
-        // POST: ItemController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Item item)
         {
             try
             {
+                _itemRepository.Delete(id);
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return View(item);
             }
         }
     }

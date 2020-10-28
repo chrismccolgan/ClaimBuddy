@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<ClaimBuddy.Models.Item>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Items";
 }
 
-<h1>Index</h1>
+<h1>Items</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -79,9 +79,9 @@
                 @Html.DisplayFor(modelItem => item.UserProfileId)
             </td>*@
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
                 @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
             </td>
         </tr>
 }
