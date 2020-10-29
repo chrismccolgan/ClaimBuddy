@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using ClaimBuddy.Auth.Models;
 using ClaimBuddy.Repositories;
 using ClaimBuddy.Models;
-using Microsoft.Extensions.Configuration;
 using System;
 
 namespace ClaimBuddy.Auth.Controllers

@@ -40,7 +40,9 @@
                 @Html.DisplayNameFor(model => model.Image)
             </dt>
             <dd class="col-sm-10">
-                <img src="@Model.Image" />
+                <a target="_blank" href="~/images/@Model.Image">
+                    <img src="~/images/@Model.Image" style="width:250px" asp-append-version="true">
+                </a>
             </dd>
         }
         <dt class="col-sm-2">

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using ClaimBuddy.Models;
 using ClaimBuddy.Models.ViewModels;
 using ClaimBuddy.Repositories;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 
 namespace ClaimBuddy.Controllers
 {
@@ -18,10 +16,13 @@ namespace ClaimBuddy.Controllers
     {
         private readonly IItemRepository _itemRepository;
         private readonly ICategoryRepository _categoryRepository;
-        public ItemController(IItemRepository itemRepository, ICategoryRepository categoryRepository)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ItemController(IItemRepository itemRepository, ICategoryRepository categoryRepository, IWebHostEnvironment webHostEnvironment)
         {
             _itemRepository = itemRepository;
             _categoryRepository = categoryRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         private int CurrentUserProfileId
@@ -60,25 +61,38 @@ namespace ClaimBuddy.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Item item)
+        public ActionResult Create(ItemFormViewModel vm)
         {
             try
             {
-                item.CreateDateTime = DateAndTime.Now;
-                item.IsDeleted = false;
-                item.UserProfileId = CurrentUserProfileId;
-                _itemRepository.Add(item);
-                return RedirectToAction(nameof(Details), new { id = item.Id });
+                if (vm.ImageFile != null)
+                {
+                    string uniqueFileName = UploadedFile(vm);
+                    vm.Item.Image = uniqueFileName;
+                }
+                vm.Item.CreateDateTime = DateTime.Now;
+                vm.Item.IsDeleted = false;
+                vm.Item.UserProfileId = CurrentUserProfileId;
+                _itemRepository.Add(vm.Item);
+                return RedirectToAction(nameof(Details), new { id = vm.Item.Id });
             }
             catch
             {
-                ItemFormViewModel vm = new ItemFormViewModel()
-                {
-                    Item = item,
-                    Categories = _categoryRepository.GetAll()
-                };
+                vm.Categories = _categoryRepository.GetAll();
                 return View(vm);
             }
+        }
+
+        private string UploadedFile(ItemFormViewModel vm)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + vm.ImageFile.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ImageFile.CopyTo(fileStream);
+            }        
+            return uniqueFileName;
         }
 
         public ActionResult Edit(int id)
@@ -98,16 +112,21 @@ namespace ClaimBuddy.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Item item)
+        public ActionResult Edit(ItemFormViewModel vm)
         {
             try
             {
-                _itemRepository.Update(item);
-                return RedirectToAction(nameof(Details), new { id = item.Id });
+                if (vm.ImageFile != null)
+                {
+                    string uniqueFileName = UploadedFile(vm);
+                    vm.Item.Image = uniqueFileName;
+                }
+                _itemRepository.Update(vm.Item);
+                return RedirectToAction(nameof(Details), new { id = vm.Item.Id });
             }
             catch
             {
-                return View(item);
+                return View(vm.Item);
             }
         }
 

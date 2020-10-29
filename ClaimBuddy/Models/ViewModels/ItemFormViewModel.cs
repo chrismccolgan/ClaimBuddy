@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ClaimBuddy.Models.ViewModels
 {
@@ -9,5 +7,6 @@ namespace ClaimBuddy.Models.ViewModels
     {
         public Item Item { get; set; }
         public List<Category> Categories { get; set; }
+        public IFormFile ImageFile { get; set; }
     }
 }
