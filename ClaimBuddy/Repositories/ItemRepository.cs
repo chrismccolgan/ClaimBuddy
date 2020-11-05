@@ -155,8 +155,8 @@ namespace ClaimBuddy.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"UPDATE Item
-                                           SET IsDeleted = 1
+                    cmd.CommandText = @"UPDATE Item 
+                                           SET IsDeleted = 1 
                                          WHERE Id = @Id";
                     cmd.Parameters.AddWithValue("@Id", id);
                     cmd.ExecuteNonQuery();

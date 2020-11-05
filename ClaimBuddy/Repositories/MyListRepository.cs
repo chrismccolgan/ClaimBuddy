@@ -49,22 +49,22 @@ namespace ClaimBuddy.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT l.Id, l.Name, l.UserProfileId,
-                                               i.Id AS ItemId, i.Name AS ItemName, i.Model, i.Price, i.CategoryId, i.Notes, i.PurchaseDateTime, i.IsDeleted,
+                                               i.Id AS ItemId, i.Name AS ItemName, i.Model, i.Price, i.CategoryId, i.Notes, i.PurchaseDateTime,
                                                c.Name as CategoryName
                                           FROM List l
                                      LEFT JOIN ListItem li ON l.Id = li.ListId
                                      LEFT JOIN Item i ON li.ItemId = i.Id
                                      LEFT JOIN Category c on i.CategoryId = c.Id
-                                         WHERE l.Id = @Id AND l.UserProfileId = @UserProfileId AND i.IsDeleted = 0"; 
+                                         WHERE l.Id = @Id AND l.UserProfileId = @UserProfileId"; 
                     cmd.Parameters.AddWithValue("@Id", id);
                     cmd.Parameters.AddWithValue("@UserProfileId", userProfileId);
-                    MyList myList = null;
                     var reader = cmd.ExecuteReader();
+                    MyList myList = null;
                     while (reader.Read())
                     {
                         if (myList == null)
                         {
-                            myList = new MyList
+                            myList = new MyList()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
