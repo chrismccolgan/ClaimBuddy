@@ -14,7 +14,7 @@ namespace ClaimBuddy.Repositories
         {
             get
             {
-                return @"SELECT i.Id, i.Name, i.Notes, i.Price, i.PurchaseDate, i.CreateDateTime, i.UserProfileId, i.CategoryId, i.Image,
+                return @"SELECT i.Id, i.Name, i.Notes, i.Price, i.PurchaseDateTime, i.CreateDateTime, i.UserProfileId, i.CategoryId, i.Image, i.ReceiptImage, i.Model,
                                 c.Name AS CategoryName
                            FROM Item i
                       LEFT JOIN UserProfile up on i.UserProfileId = up.Id
@@ -31,8 +31,10 @@ namespace ClaimBuddy.Repositories
                 Name = reader.GetString(reader.GetOrdinal("Name")),
                 Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
                 Notes = reader.IsDBNull(reader.GetOrdinal("Notes")) ? null : reader.GetString(reader.GetOrdinal("Notes")),
+                ReceiptImage = reader.IsDBNull(reader.GetOrdinal("ReceiptImage")) ? null : reader.GetString(reader.GetOrdinal("ReceiptImage")),
+                Model = reader.IsDBNull(reader.GetOrdinal("Model")) ? null : reader.GetString(reader.GetOrdinal("Model")),
                 Price = reader.GetDecimal(reader.GetOrdinal("Price")),
-                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                PurchaseDateTime = reader.GetDateTime(reader.GetOrdinal("PurchaseDateTime")),
                 CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                 UserProfileId = reader.GetInt32(reader.GetOrdinal("UserProfileId")),
                 CategoryId = reader.GetInt32(reader.GetOrdinal("CategoryId")),
@@ -51,7 +53,7 @@ namespace ClaimBuddy.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = ItemQuery + " AND i.UserProfileId = @UserProfileId";
+                    cmd.CommandText = ItemQuery + " AND i.UserProfileId = @UserProfileId ORDER BY i.Name";
                     cmd.Parameters.AddWithValue("@UserProfileId", userProfileId);
                     var items = new List<Item>();
                     var reader = cmd.ExecuteReader();
@@ -94,14 +96,16 @@ namespace ClaimBuddy.Repositories
                 conn.Open();
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Item (Name, Notes, Price, Image, PurchaseDate, CreateDateTime, IsDeleted, CategoryId, UserProfileId)
+                    cmd.CommandText = @"INSERT INTO Item (Name, Notes, Price, Image, PurchaseDateTime, CreateDateTime, IsDeleted, CategoryId, UserProfileId, Model, ReceiptImage)
                                         OUTPUT INSERTED.ID
-                                        VALUES (@Name, @Notes, @Price, @Image, @PurchaseDate, @CreateDateTime, @IsDeleted, @CategoryId, @UserProfileId)";
+                                        VALUES (@Name, @Notes, @Price, @Image, @PurchaseDateTime, @CreateDateTime, @IsDeleted, @CategoryId, @UserProfileId, @Model, @ReceiptImage)";
                     cmd.Parameters.AddWithValue("@Name", item.Name);
                     cmd.Parameters.AddWithValue("@Notes", item.Notes ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Price", item.Price);
                     cmd.Parameters.AddWithValue("@Image", item.Image ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@PurchaseDate", item.PurchaseDate);
+                    cmd.Parameters.AddWithValue("@ReceiptImage", item.ReceiptImage ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Model", item.Model ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PurchaseDateTime", item.PurchaseDateTime);
                     cmd.Parameters.AddWithValue("@CreateDateTime", item.CreateDateTime);
                     cmd.Parameters.AddWithValue("@IsDeleted", item.IsDeleted);
                     cmd.Parameters.AddWithValue("@CategoryId", item.CategoryId);
@@ -121,23 +125,23 @@ namespace ClaimBuddy.Repositories
                     cmd.CommandText = @"UPDATE Item
                                            SET Name = @Name,
                                                Notes = @Notes,
+                                               Model = @Model,
                                                Price = @Price, 
                                                Image = @Image, 
-                                               PurchaseDate = @PurchaseDate,
-                                               CreateDateTime = @CreateDateTime, 
+                                               ReceiptImage = @ReceiptImage, 
+                                               PurchaseDateTime = @PurchaseDateTime,
                                                IsDeleted = @IsDeleted,
-                                               CategoryId = @CategoryId, 
-                                               UserProfileId = @UserProfileId
+                                               CategoryId = @CategoryId
                                          WHERE Id = @Id";
                     cmd.Parameters.AddWithValue("@Name", item.Name);
                     cmd.Parameters.AddWithValue("@Notes", item.Notes ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Price", item.Price);
                     cmd.Parameters.AddWithValue("@Image", item.Image ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@PurchaseDate", item.PurchaseDate);
-                    cmd.Parameters.AddWithValue("@CreateDateTime", item.CreateDateTime);
+                    cmd.Parameters.AddWithValue("@ReceiptImage", item.ReceiptImage ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Model", item.Model ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@PurchaseDateTime", item.PurchaseDateTime);
                     cmd.Parameters.AddWithValue("@IsDeleted", item.IsDeleted);
                     cmd.Parameters.AddWithValue("@CategoryId", item.CategoryId);
-                    cmd.Parameters.AddWithValue("@UserProfileId", item.UserProfileId);
                     cmd.Parameters.AddWithValue("@Id", item.Id);
                     cmd.ExecuteNonQuery();
                 }

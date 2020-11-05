@@ -70,6 +70,11 @@ namespace ClaimBuddy.Controllers
                     string uniqueFileName = UploadedFile(vm);
                     vm.Item.Image = uniqueFileName;
                 }
+                if (vm.ReceiptImageFile != null)
+                {
+                    string uniqueFileName2 = UploadedFile2(vm);
+                    vm.Item.ReceiptImage = uniqueFileName2;
+                }
                 vm.Item.CreateDateTime = DateTime.Now;
                 vm.Item.IsDeleted = false;
                 vm.Item.UserProfileId = CurrentUserProfileId;
@@ -93,6 +98,18 @@ namespace ClaimBuddy.Controllers
                 vm.ImageFile.CopyTo(fileStream);
             }        
             return uniqueFileName;
+        }
+
+        private string UploadedFile2(ItemFormViewModel vm)
+        {
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+            string uniqueFileName2 = Guid.NewGuid().ToString() + "_" + vm.ReceiptImageFile.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName2);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                vm.ReceiptImageFile.CopyTo(fileStream);
+            }
+            return uniqueFileName2;
         }
 
         public ActionResult Edit(int id)
@@ -121,18 +138,27 @@ namespace ClaimBuddy.Controllers
                     string uniqueFileName = UploadedFile(vm);
                     vm.Item.Image = uniqueFileName;
                 }
+                if (vm.ReceiptImageFile != null)
+                {
+                    string uniqueFileName2 = UploadedFile2(vm);
+                    vm.Item.ReceiptImage = uniqueFileName2;
+                }
                 _itemRepository.Update(vm.Item);
                 return RedirectToAction(nameof(Details), new { id = vm.Item.Id });
             }
             catch
             {
-                return View(vm.Item);
+                return View(vm);
             }
         }
 
         public ActionResult Delete(int id)
         {
             Item item = _itemRepository.GetById(id, CurrentUserProfileId);
+            if (item == null)
+            {
+                return NotFound();
+            }
             return View(item);
         }
 

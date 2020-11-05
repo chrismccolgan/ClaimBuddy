@@ -14,8 +14,15 @@ namespace ClaimBuddy.Models
         public string Notes { get; set; }
 
         [Required]
+        [DisplayName("Value")]
         public decimal Price { get; set; }
 
+        [DisplayName("Receipt Image")]
+        public string ReceiptImage { get; set; }
+
+        public string Model { get; set; }
+
+        [DisplayName("Item Image")]
         public string Image { get; set; }
 
         [DataType(DataType.Date)]
@@ -25,7 +32,7 @@ namespace ClaimBuddy.Models
         [Required]
         [DataType(DataType.Date)]
         [DisplayName("Purchased")]
-        public DateTime PurchaseDate { get; set; }
+        public DateTime PurchaseDateTime { get; set; }
 
         public bool IsDeleted { get; set; }
 

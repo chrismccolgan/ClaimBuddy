@@ -1,40 +1,41 @@
-﻿@model IEnumerable<ClaimBuddy.Models.Item>
+﻿@model ClaimBuddy.Models.MyList
 
 @{
-    ViewData["Title"] = "Items";
+    ViewData["Title"] = "Details";
 }
 
-<h1>Items</h1>
-
+<h1>@Model.Name</h1>
 <p>
-    <a asp-action="Create">Create New</a>
+    @Html.ActionLink("Edit List", "Edit", new { id = Model.Id })
 </p>
+
 <table class="table table-striped">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PurchaseDateTime)
+                Purchased
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Model)
+                Model
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                Value
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CategoryId)
+                Category
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Notes)
+                Notes
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model.Items)
+        {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.PurchaseDateTime)
@@ -54,12 +55,14 @@
             <td style="max-width:250px;">
                 @Html.DisplayFor(modelItem => item.Notes)
             </td>
-            <td class="float-right" style="min-width: 170px;">
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            <td class="float-right">
+                @Html.ActionLink("Details", "Details", "Item", new { id = item.Id }, null)
             </td>
         </tr>
-}
+        }
     </tbody>
 </table>
+
+<div>
+    <a asp-action="Index">Back to List Index</a>
+</div>

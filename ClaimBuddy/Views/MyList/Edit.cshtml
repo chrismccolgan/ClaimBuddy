@@ -1,0 +1,93 @@
+﻿@model ClaimBuddy.Models.ViewModels.ListItemViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group" hidden>
+                <input asp-for="MyList.Id" class="form-control" type="hidden" />
+            </div>
+            <div class="form-group">
+                <label asp-for="MyList.Name" class="control-label" hidden></label>
+                <input asp-for="MyList.Name" class="form-control" />
+                <span asp-validation-for="MyList.Name" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    Purchased
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Model
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Notes
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Item item in Model.AllItems)
+            {
+                bool isSelected = Model.SelectedItemIds.Contains(item.Id);
+            <tr>
+                <td>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               name="selectedItemIds"
+                               id="@item.Id" value="@item.Id" checked="@isSelected" />
+                        <label class="form-check-label" for="@item.Id"></label>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PurchaseDateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Model)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.Name)
+                </td>
+                <td style="max-width:250px;">
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List Index</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

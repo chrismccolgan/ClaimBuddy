@@ -13,9 +13,9 @@
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Item.PurchaseDate" class="control-label"></label>
-                <input asp-for="Item.PurchaseDate" class="form-control" />
-                <span asp-validation-for="Item.PurchaseDate" class="text-danger"></span>
+                <label asp-for="Item.PurchaseDateTime" class="control-label"></label>
+                <input asp-for="Item.PurchaseDateTime" class="form-control" />
+                <span asp-validation-for="Item.PurchaseDateTime" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Item.Name" class="control-label"></label>
@@ -23,14 +23,14 @@
                 <span asp-validation-for="Item.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Item.Model" class="control-label"></label>
+                <input asp-for="Item.Model" class="form-control" />
+                <span asp-validation-for="Item.Model" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Item.Price" class="control-label"></label>
                 <input asp-for="Item.Price" class="form-control" />
                 <span asp-validation-for="Item.Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageFile" class="control-label"></label>
-                <input asp-for="ImageFile" type="file" accept="image/*" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Item.CategoryId" class="control-label"></label>
@@ -45,8 +45,18 @@
             </div>
             <div class="form-group">
                 <label asp-for="Item.Notes" class="control-label"></label>
-                <textarea asp-for="Item.Notes" class="form-control" rows="15"></textarea>
+                <textarea asp-for="Item.Notes" class="form-control" rows="5"></textarea>
                 <span asp-validation-for="Item.Notes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" type="file" accept="image/*" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReceiptImageFile" class="control-label"></label>
+                <input asp-for="ReceiptImageFile" type="file" accept="image/*" />
+                <span asp-validation-for="ReceiptImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -56,7 +66,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to Item Index</a>
 </div>
 
 @section Scripts {

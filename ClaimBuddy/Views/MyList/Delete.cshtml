@@ -1,0 +1,65 @@
+﻿@model ClaimBuddy.Models.MyList
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<div>
+    <h4>Are you sure you want to delete @Model.Name?</h4>
+    <table class="table table-striped" style="margin-top: 1rem;">
+        <thead>
+            <tr>
+                <th>
+                    Purchased
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Model
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Category
+                </th>
+                <th>
+                    Notes
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PurchaseDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Model)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    <td style="max-width:250px;">
+                        @Html.DisplayFor(modelItem => item.Notes)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+    <form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List Index</a>
+    </form>
+</div>

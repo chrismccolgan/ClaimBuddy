@@ -28,6 +28,7 @@ namespace ClaimBuddy
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<IFirebaseAuthService, FirebaseAuthService>();
             services.AddTransient<IUserProfileRepository, UserProfileRepository>();
+            services.AddTransient<IMyListRepository, MyListRepository>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

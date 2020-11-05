@@ -9,19 +9,19 @@ GO
 
 DROP TABLE IF EXISTS [UserProfile];
 DROP TABLE IF EXISTS [Item];
-DROP TABLE IF EXISTS [Claim];
-DROP TABLE IF EXISTS [ClaimItem];
+DROP TABLE IF EXISTS [List];
+DROP TABLE IF EXISTS [ListItem];
 DROP TABLE IF EXISTS [Category];
 GO
 
 CREATE TABLE [UserProfile]
 (
   [Id] integer PRIMARY KEY IDENTITY,
-  [FirebaseUserId] NVARCHAR(28) NOT NULL,
+  [FirebaseUserId] nvarchar(28) NOT NULL,
   [FirstName] nvarchar(50) NOT NULL,
   [LastName] nvarchar(50) NOT NULL,
-  [Email] nvarchar(555) NOT NULL,
-  [CreateDateTime] datetime NOT NULL
+  [Email] nvarchar(100) NOT NULL,
+  [CreateDateTime] datetime NOT NULL,
 
   CONSTRAINT UQ_FirebaseUserId UNIQUE(FirebaseUserId),
   CONSTRAINT UQ_Email UNIQUE(Email)
@@ -39,30 +39,35 @@ CREATE TABLE [Item]
   [Name] nvarchar(255) NOT NULL,
   [Notes] text,
   [Price] money NOT NULL,
+  [Model] nvarchar(100),
+  [ReceiptImage] nvarchar(255),
   [Image] nvarchar(255),
-  [PurchaseDate] date NOT NULL,
+  [PurchaseDateTime] datetime NOT NULL,
   [CreateDateTime] datetime NOT NULL,
   [IsDeleted] bit NOT NULL DEFAULT 0,
-  [CategoryId] integer,
+  [CategoryId] integer NOT NULL,
   [UserProfileId] integer NOT NULL,
 
-  CONSTRAINT [FK_Post_Category] FOREIGN KEY ([CategoryId]) REFERENCES [Category] ([Id]),
-  CONSTRAINT [FK_Post_UserProfile] FOREIGN KEY ([UserProfileId]) REFERENCES [UserProfile] ([Id])
+  CONSTRAINT [FK_Item_Category] FOREIGN KEY ([CategoryId]) REFERENCES [Category] ([Id]),
+  CONSTRAINT [FK_Item_UserProfile] FOREIGN KEY ([UserProfileId]) REFERENCES [UserProfile] ([Id])
 )
 
-CREATE TABLE [Claim]
+CREATE TABLE [List]
 (
   [Id] integer PRIMARY KEY IDENTITY,
-  [Name] nvarchar(50) NOT NULL
+  [Name] nvarchar(50) NOT NULL,
+  [UserProfileId] integer NOT NULL,
+
+  CONSTRAINT [FK_List_UserProfileId] FOREIGN KEY ([UserProfileId]) REFERENCES [UserProfile] ([Id])
 )
 
-CREATE TABLE [ClaimItem]
+CREATE TABLE [ListItem]
 (
   [Id] integer PRIMARY KEY IDENTITY,
   [ItemId] integer NOT NULL,
-  [ClaimId] integer NOT NULL,
+  [ListId] integer NOT NULL,
 
-  CONSTRAINT [FK_ClaimItem_Claim] FOREIGN KEY ([ClaimId]) REFERENCES [Claim] ([Id]) ON DELETE CASCADE,
-  CONSTRAINT [FK_ClaimItem_Item] FOREIGN KEY ([ItemId]) REFERENCES [Item] ([Id])
+  CONSTRAINT [FK_ListItem_List] FOREIGN KEY ([ListId]) REFERENCES [List] ([Id]),
+  CONSTRAINT [FK_ListItem_Item] FOREIGN KEY ([ItemId]) REFERENCES [Item] ([Id])
 )
-GO
+GO   
